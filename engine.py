@@ -1,32 +1,39 @@
-import pygame
-from pygame.locals import *
-from random import randrange
-from graphics import *
-from engine import *
 from engineConstants import *
 
-
 def resetGame():
-    global playerWalking, flip, playerx, playery, playerxv, playeryv, playerAlive
-    global screenShake, screenShakeOn, screenShakeCountdown
-    global bullets, monsters, keysDown, grid, currentBulletCooldown, currentMonsterCooldown
-    
-    bullets, monsters, keysDown, grid = [], [], [], []
-
+    global bullets, monsters, keysDown, walking, flip, playerx, playery, playerxv, playeryv, playerHeight, playerWidth
+    global alive, playerRunSpeed, playerJumpSpeed, screenShakeOn, screenShake, screenShakeCountdown
+    global bulletLifetime, totalCooldown, cooldown, bulletSpeed, grid, monsterCooldown
+    bullets = []
+    monsters = []
+    keysDown = []
+    grid = []
     generateGrid()
-    playerWalking = False
+    walking = False
     flip = False
 
-    playerx = PLAYERSTARTINGX
-    playery = PLAYERSTARTINGY
+    #starting position
+    playerx = (SCREENWIDTH-32)
+    playery = (SCREENHEIGHT-64)
     playerxv = 0
     playeryv = 0
+    playerHeight = 32
+    playerWidth = 32
 
-    playerAlive = True
+    alive = True
 
+    playerRunSpeed = PLAYERRUNSPEED
+    playerJumpSpeed = PLAYERJUMPSPEED
 
-    currentBulletCooldown = 0
-    currentMonsterCooldown = 0
+    #How many frames bullets last for
+    bulletLifetime = 50
+    #How many frames between each bullet
+    totalCooldown = 10
+    cooldown = 0
+    #How fast the bullet travels
+    bulletSpeed = 30
+
+    monsterCooldown = 0
     
     screenShake = 0
     screenShakeOn = False
@@ -79,52 +86,52 @@ def updatePlayer():
     global playerxv
     global playeryv
     global flip
-    global playerWalking
+    global walking
     global bullets
-    global currentBulletCooldown
+    global cooldown
     global grid
-    global playerAlive
+    global alive
     global screenShakeCountdown
     global screenShakeOn
 
     #key handling
     if (K_d in keysDown):
-        playerxv += PLAYERRUNSPEED
+        playerxv += playerRunSpeed
         flip = True
     if (K_a in keysDown):
-        playerxv -= PLAYERRUNSPEED
+        playerxv -= playerRunSpeed
         flip = False
     #jump
     if (K_w in keysDown):
-        if(playery <= (SCREENHEIGHT - PLAYERHEIGHT)):
+        if(playery <= (SCREENHEIGHT - playerHeight)):
             keysDown.remove(K_w)
-            playeryv -= PLAYERJUMPSPEED
+            playeryv -= playerJumpSpeed
     #shooting
     if (K_SPACE in keysDown):
-        if(currentBulletCooldown <= 0):
+        if(cooldown <= 0):
             direction = 0
             if (flip == True):
                 direction = 1
-            bulletInstance = [playerx, playery+(PLAYERWIDTH/2), BULLETLIFETIME, direction]
+            bulletInstance = [playerx, playery+(playerWidth/2), bulletLifetime, direction]
             bullets.append(bulletInstance)
-            currentBulletCooldown = TOTALBULLETCOOLDOWN 
+            cooldown = totalCooldown 
             if(flip == True):
                 playerxv -= 1
             else:
                 playerxv += 1
             screenShakeOn = True
             screenShakeCountdown = 20
-    currentBulletCooldown -= 1
+    cooldown -= 1
 
     #boundary collisions
     if (playerx < 0):
         playerx = 0
         playerxv *= WALLBOUNCEFACTOR
-    if (playerx > (SCREENWIDTH-PLAYERWIDTH)):
-        playerx = SCREENWIDTH-PLAYERWIDTH
+    if (playerx > (SCREENWIDTH-playerWidth)):
+        playerx = SCREENWIDTH-playerWidth
         playerxv *= WALLBOUNCEFACTOR
-    if (playery > (SCREENHEIGHT-PLAYERHEIGHT)):
-        playerAlive = False
+    if (playery > (SCREENHEIGHT-playerHeight)):
+        alive = False
     if (playery < 0):
         playery = 0
         playeryv *= TOPBOUNCEFACTOR
@@ -132,9 +139,9 @@ def updatePlayer():
 
     #changing animations from standing to running
     if( (playerxv < 2) and (playerxv > -2)):
-        playerWalking = False
+        walking = False
     else:
-        playerWalking = True
+        walking = True
 
     #gravity
     if( playery < (SCREENHEIGHT - 32)):
@@ -185,20 +192,20 @@ def updatePlayer():
 
 
 def displayScreen():
-    global playerWalking
+    global walking
     global flip
     
     #decide which sprite to display
-    if (playerWalking == False):
+    if (walking == False):
         if (flip == False):
-            spritePlayerStanding.blit(windowSurface, (playerx+screenShake, playery+screenShake))
+            playerStanding.blit(windowSurface, (playerx+screenShake, playery+screenShake))
         else:
-            spritePlayerStandingFlip.blit(windowSurface, (playerx+screenShake, playery+screenShake))
+            playerStandingFlip.blit(windowSurface, (playerx+screenShake, playery+screenShake))
     else:
         if (flip == False):
-            spritePlayerWalking.blit(windowSurface, (playerx+screenShake, playery+screenShake))
+            playerWalking.blit(windowSurface, (playerx+screenShake, playery+screenShake))
         else:
-            spritePlayerWalkingFlip.blit(windowSurface, (playerx+screenShake, playery+screenShake)) 
+            playerWalkingFlip.blit(windowSurface, (playerx+screenShake, playery+screenShake)) 
 
 
 def bulletMonsterCollision(playerx, playery, monsterx, monstery):
@@ -234,19 +241,21 @@ def updateBullets():
         if(i[2] > 0):
             bulletxTile = int(i[0]/32)
             bulletyTile = int(i[1]/32)
-            spriteBullet.blit(windowSurface, (i[0], i[1]))
+            bullet.blit(windowSurface, (i[0], i[1]))
             i[2] = i[2] - 1
             if(i[3] == 0):
                           
-                i[0] -= BULLETSPEED
+                i[0] -= bulletSpeed
             else:
-                i[0] += BULLETSPEED    
+                i[0] += bulletSpeed    
             #check for hitting monsters
             for monster in monsters:
                 if (bulletMonsterCollision(i[0], i[1], monster[0], monster[1])):
                     if(i in bullets):
                         bullets.remove(i)
                         monster[4] -= 1
+
+
         else:
             bullets.remove(i)
 
@@ -255,9 +264,9 @@ def updateMonsters():
     global monsters
     global playerx
     global playery
-    global playerAlive
+    global alive
     for i in monsters:
-        spriteMonster1.blit(windowSurface, (i[0], i[1]))
+        monster1.blit(windowSurface, (i[0], i[1]))
         i[0] += i[2]
         if(i[0] < 0 or i[0] > (SCREENWIDTH-32)):
             i[2] *= -1
@@ -284,9 +293,8 @@ def updateMonsters():
             if (i[2]>0): i[2] += 2
             else: i[2] -= 2
         if(playerMonsterCollision(playerx, playery, i[0], i[1])):
-            playerAlive = False
+            alive = False
 
-           
 def createMonster():
     global monsters
     xStart = randrange(0, SCREENWIDTH - 32)
@@ -294,6 +302,10 @@ def createMonster():
     singleMonster = [xStart, 0, 3, direction, 1]
     monsters.append(singleMonster)
 
+
+
+
+        
 def handleScreenShake():
     global screenShake
     global screenShakeOn
@@ -325,11 +337,11 @@ def displayGrid():
 
 def playGame():
 
-    global playerAlive
+    global alive
     global monsters
-    global currentMonsterCooldown
+    global monsterCooldown
     
-    while playerAlive == True: # main loop
+    while alive == True: # main loop
         time_passed = clock.tick(60)
         windowSurface.fill((0, 0, 0))
         #handle input
@@ -350,26 +362,10 @@ def playGame():
         updateBullets()
         updateMonsters()
 
-        if currentMonsterCooldown <= 0:
+        if monsterCooldown <= 0:
             createMonster()
-            currentMonsterCooldown = randrange(FASTESTMONSTERGEN, SLOWESTMONSTERGEN)
+            monsterCooldown = randrange(FASTESTMONSTERGEN, SLOWESTMONSTERGEN)
         else:
-            currentMonsterCooldown-=1
+            monsterCooldown-=1
       
         pygame.display.update()
-
-
-
-        
-#Initialisation
-#
-pygame.init()
-
-windowSurface = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT), 0, 32)
-background_colour = (255,255,255)
-clock = pygame.time.Clock()
-        
-while True:
-    displayTitleScreen()
-    resetGame()
-    playGame()

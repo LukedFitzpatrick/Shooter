@@ -1,0 +1,32 @@
+SCREENWIDTH=800 #25 tiles wide
+SCREENHEIGHT=480 #15 tiles high
+
+PLAYERHEIGHT = 32
+PLAYERWIDTH = 32
+
+PLAYERSTARTINGX = (SCREENWIDTH-PLAYERWIDTH)
+PLAYERSTARTINGY = (SCREENHEIGHT-(PLAYERHEIGHT*2))
+
+PLAYERRUNSPEED = 0.5
+PLAYERJUMPSPEED = 12
+
+WALLBOUNCEFACTOR = -0.5
+TOPBOUNCEFACTOR = -0.5
+
+#How many frames bullets last for
+BULLETLIFETIME = 50
+
+#How many frames between each bullet
+TOTALBULLETCOOLDOWN = 10
+
+#How fast the bullet travels
+BULLETSPEED = 30
+
+#how long the screen shake lasts for
+MAXSCREENSHAKECOUNTDOWN = 20
+
+#how far the screen shakes
+SCREENSHAKEINCREMENT = 3
+
+#amount of frames that it takes for a new monster to generate
+FASTESTMONSTERGEN, SLOWESTMONSTERGEN = 20, 80

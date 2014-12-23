@@ -32,12 +32,9 @@ screenShake = 0
 screenShakeOn = False
 screenShakeCountdown = 20
 
-wall = pygame.image.load('wall.png')
-platform = pygame.image.load('platform.png')
-wallhole1 = pygame.image.load('wallbulletholes1.png')
-wallhole2 = pygame.image.load('wallbulletholes2.png')
-wallhole3 = pygame.image.load('wallbulletholes3.png')
-wallhole4 = pygame.image.load('wallbulletholes4.png')
+wall = pygame.image.load('platform.png')
+platform = pygame.image.load('wall.png')
+
 
 def resetGame():
     global bullets, monsters, keysDown, walking, flip, playerx, playery, playerxv, playeryv, playerHeight, playerWidth
@@ -336,11 +333,6 @@ def generateGrid():
         grid[x][14] =1
     for x in range(18, 25):
         grid[x][14] = 1
-    #holes
-    grid[5][4] = -2
-    grid[6][4] = -3
-    grid[5][3] = -4
-    grid[6][3] = -5
 
 
 def displayGrid():
@@ -368,10 +360,6 @@ def displayGrid():
             image = wall
             if (grid[x][y] == 0): image = wall
             elif (grid[x][y] == 1): image = platform
-            elif (grid[x][y] == -2): image = wallhole1
-            elif (grid[x][y] == -3): image = wallhole2
-            elif (grid[x][y] == -4): image = wallhole3
-            elif (grid[x][y] == -5): image = wallhole4
             windowSurface.blit(image, ((x*32) + screenShake, (y*32) + screenShake))
     
 

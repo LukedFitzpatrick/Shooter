@@ -7,28 +7,25 @@ from engineConstants import *
 
 
 def resetGame():
-    global playerWalking, flip, playerx, playery, playerxv, playeryv, playerAlive
-    global screenShake, screenShakeOn, screenShakeCountdown
-    global bullets, monsters, keysDown, grid, currentBulletCooldown, currentMonsterCooldown
-    
+    global bullets, monsters, keysDown, grid
     bullets, monsters, keysDown, grid = [], [], [], []
 
     generateGrid()
+    
+    global playerWalking, flip
     playerWalking = False
     flip = False
-
-    playerx = PLAYERSTARTINGX
-    playery = PLAYERSTARTINGY
-    playerxv = 0
-    playeryv = 0
-
-    playerAlive = True
-
-
-    currentBulletCooldown = 0
-    currentMonsterCooldown = 0
     
-    screenShake = 0
+    global playerx, playery, playerxv, playeryv, playerAlive
+    playerx, playery = PLAYERSTARTINGX, PLAYERSTARTINGY
+    playerxv, playeryv = 0, 0
+    playerAlive = True
+    
+    global currentBulletCooldown, currentMonsterCooldown
+    currentBulletCooldown, currentMonsterCooldown = 0, 0
+    
+    global currentScreenShake, screenShakeOn, screenShakeCountdown
+    currentScreenShake = 0
     screenShakeOn = False
     screenShakeCountdown = MAXSCREENSHAKECOUNTDOWN
     
@@ -191,25 +188,25 @@ def displayScreen():
     #decide which sprite to display
     if (playerWalking == False):
         if (flip == False):
-            spritePlayerStanding.blit(windowSurface, (playerx+screenShake, playery+screenShake))
+            spritePlayerStanding.blit(windowSurface, (playerx+currentScreenShake, playery+currentScreenShake))
         else:
-            spritePlayerStandingFlip.blit(windowSurface, (playerx+screenShake, playery+screenShake))
+            spritePlayerStandingFlip.blit(windowSurface, (playerx+currentScreenShake, playery+currentScreenShake))
     else:
         if (flip == False):
-            spritePlayerWalking.blit(windowSurface, (playerx+screenShake, playery+screenShake))
+            spritePlayerWalking.blit(windowSurface, (playerx+currentScreenShake, playery+currentScreenShake))
         else:
-            spritePlayerWalkingFlip.blit(windowSurface, (playerx+screenShake, playery+screenShake)) 
+            spritePlayerWalkingFlip.blit(windowSurface, (playerx+currentScreenShake, playery+currentScreenShake)) 
 
 
-def bulletMonsterCollision(playerx, playery, monsterx, monstery):
-    if ((playerx + 4) > monsterx) and ((playerx+4) < (monsterx + 32)):
-        if ((playery + 4) > monstery) and ((playery+4) < (monstery + 32)):
+def bulletMonsterCollision(bulletx, bullety, monsterx, monstery):
+    if ((bulletx + 4) > monsterx) and ((bulletx+4) < (monsterx + 32)):
+        if ((bullety + 4) > monstery) and ((bullety+4) < (monstery + 32)):
             return True
-    if ((playerx) > monsterx) and ((playerx) < (monsterx + 32)):
-        if ((playery) > monstery) and ((playery) < (monstery + 32)):
+    if ((bulletx) > monsterx) and ((bulletx) < (monsterx + 32)):
+        if ((bullety) > monstery) and ((bullety) < (monstery + 32)):
             return True
-    if ((playerx + 8) > monsterx) and ((playerx+8) < (monsterx + 32)):
-        if ((playery + 8) > monstery) and ((playery+8) < (monstery + 32)):
+    if ((bulletx + 8) > monsterx) and ((bulletx+8) < (monsterx + 32)):
+        if ((bullety + 8) > monstery) and ((bullety+8) < (monstery + 32)):
             return True
     return False
 

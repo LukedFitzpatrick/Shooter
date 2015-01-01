@@ -103,8 +103,8 @@ def updatePlayer():
             direction = 0
             if (flip == True):
                 direction = 1
-            bulletInstance = [playerx, playery+(PLAYERWIDTH/2), BULLETLIFETIME, direction]
-            bullets.append(bulletInstance)
+           
+            createBullet(playerx, playery+(PLAYERWIDTH/2), direction)
             currentBulletCooldown = TOTALBULLETCOOLDOWN 
             if(flip == True):
                 playerxv -= 1
@@ -228,25 +228,44 @@ def updateBullets():
     global bullets
     global grid
     #update and display the bullets
-    for i in bullets:    
-        if(i[2] > 0):
-            bulletxTile = int(i[0]/32)
-            bulletyTile = int(i[1]/32)
-            spriteBullet.blit(windowSurface, (i[0], i[1]))
-            i[2] = i[2] - 1
-            if(i[3] == 0):
-                          
-                i[0] -= BULLETSPEED
+    for bullet in bullets:    
+        if(bullet.alive == True):
+            bulletxTile = int(bullet.x/32)
+            bulletyTile = int(bullet.y/32)
+            
+            if(grid[bulletxTile][bulletyTile] > 0):
+                bullet.alive = False
             else:
-                i[0] += BULLETSPEED    
-            #check for hitting monsters
-            for monster in monsters:
-                if (bulletMonsterCollision(i[0], i[1], monster.x, monster.y)):
-                    if(i in bullets):
-                        bullets.remove(i)
-                        monster.alive = False
+                bullet.sprite.blit(windowSurface, (bullet.x, bullet.y))
+                
+                bullet.x += bullet.xV
+                bullet.y += bullet.yV
+                
+                if(bullet.x < 0 or bullet.x > SCREENWIDTH):
+                    bullet.alive = False
+                
+                #check for hitting monsters
+                for monster in monsters:
+                    if (bulletMonsterCollision(bullet.x, bullet.y, monster.x, monster.y)):
+                        if(bullet in bullets):
+                            bullet.alive = False
+                            monster.alive = False
         else:
-            bullets.remove(i)
+            bullets.remove(bullet)
+
+
+def createBullet(x, y, direction):
+    global bullets
+    xStart = x
+    
+    xVStart = BULLETSPEED
+    if (direction == 0):
+        xVStart *= -1
+    
+    singleBullet = Monster(spriteBullet, xStart, y, xVStart, 0, True)
+    bullets.append(singleBullet)
+
+            
 def createMonster():
     global monsters
     xStart = randrange(0, SCREENWIDTH - 32)

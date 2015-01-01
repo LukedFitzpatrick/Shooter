@@ -1,9 +1,11 @@
 import pygame
 from pygame.locals import *
-from random import randrange
+from random import *
+import random
 from graphics import *
 from engine import *
 from engineConstants import *
+from monster import *
 
 
 def resetGame():
@@ -240,13 +242,21 @@ def updateBullets():
                 i[0] += BULLETSPEED    
             #check for hitting monsters
             for monster in monsters:
-                if (bulletMonsterCollision(i[0], i[1], monster[0], monster[1])):
+                if (bulletMonsterCollision(i[0], i[1], monster.x, monster.y)):
                     if(i in bullets):
                         bullets.remove(i)
-                        monster[4] -= 1
+                        monster.alive = False
         else:
             bullets.remove(i)
+def createMonster():
+    global monsters
+    xStart = randrange(0, SCREENWIDTH - 32)
+    xVStart = randrange(2, 6) * random.choice([-1, 1])
+    
+    singleMonster = Monster(spriteMonster1, xStart, 0, xVStart, 0, True)
+    monsters.append(singleMonster)
 
+    
 
 def updateMonsters():
     global monsters
@@ -254,42 +264,37 @@ def updateMonsters():
     global playery
     global playerAlive
     for i in monsters:
-        spriteMonster1.blit(windowSurface, (i[0], i[1]))
-        i[0] += i[2]
-        if(i[0] < 0 or i[0] > (SCREENWIDTH-32)):
-            i[2] *= -1
-        if i[4] == 0:
+        i.sprite.blit(windowSurface, (i.x, i.y))
+        i.x += i.xV
+        if(i.x < 0 or i.x > (SCREENWIDTH-32)):
+            i.xV *= -1
+        if i.alive == False:
             monsters.remove(i)
         #gravity
-        if( i[1] < (SCREENHEIGHT - 32)):
-            i[3] += 0.5
+        if( i.y < (SCREENHEIGHT - 32)):
+            i.yV += 0.5
         
         #find distance to nearest obstacle:
-        obstacleDistance = i[3] 
-        monsteryTile = int(i[1]/32)
-        monsterxTile = int(i[0]/32)
-        if (i[3] > 0): #falling down
+        obstacleDistance = i.yV 
+        monsteryTile = int(i.y/32)
+        monsterxTile = int(i.x/32)
+        if (i.yV > 0): #falling down
             for tile in range(monsteryTile+1, 15):
                 if grid[monsterxTile][tile] >= 1:
-                    distanceToTile = (32*tile) - (i[1] + 32)
+                    distanceToTile = (32*tile) - (i.y + 32)
                     if (distanceToTile < obstacleDistance):
                         obstacleDistance = distanceToTile
-                        i[3] = 0
-        i[1] += obstacleDistance
-        if(i[1] > (SCREENHEIGHT)):
-            i[1] = 0
-            if (i[2]>0): i[2] += 2
-            else: i[2] -= 2
-        if(playerMonsterCollision(playerx, playery, i[0], i[1])):
+                        i.yV = 0
+        i.y += obstacleDistance
+        if(i.y > (SCREENHEIGHT)):
+            i.y = 0
+            if (i.xV>0): i.xV += 2
+            else: i.xV -= 2
+        if(playerMonsterCollision(playerx, playery, i.x, i.y)):
             playerAlive = False
 
            
-def createMonster():
-    global monsters
-    xStart = randrange(0, SCREENWIDTH - 32)
-    direction = randrange(0, 1)
-    singleMonster = [xStart, 0, 3, direction, 1]
-    monsters.append(singleMonster)
+
 
 def handleScreenShake():
     global screenShake

@@ -3,7 +3,6 @@ from pygame.locals import *
 from random import *
 import random
 from graphics import *
-from engine import *
 from engineConstants import *
 from monster import *
 
@@ -62,7 +61,7 @@ def generateGrid():
         
         
 def displayTitleScreen():
-   titleScreen = pygame.image.load('titleScreen.png').convert()
+   titleScreen = pygame.image.load('graphics/titleScreen.png').convert()
    windowSurface.blit(titleScreen, (0, 0))
    pygame.display.flip()
    buttonPressed = False
@@ -263,34 +262,35 @@ def updateMonsters():
     global playerx
     global playery
     global playerAlive
-    for i in monsters:
-        i.sprite.blit(windowSurface, (i.x, i.y))
-        i.x += i.xV
-        if(i.x < 0 or i.x > (SCREENWIDTH-32)):
-            i.xV *= -1
-        if i.alive == False:
-            monsters.remove(i)
+    
+    for monster in monsters:
+        monster.sprite.blit(windowSurface, (monster.x, monster.y))
+        monster.x += monster.xV
+        if(monster.x < 0 or monster.x > (SCREENWIDTH-32)):
+            monster.xV *= -1
+        if monster.alive == False:
+            monsters.remove(monster)
         #gravity
-        if( i.y < (SCREENHEIGHT - 32)):
-            i.yV += 0.5
+        if( monster.y < (SCREENHEIGHT - 32)):
+            monster.yV += 0.5
         
         #find distance to nearest obstacle:
-        obstacleDistance = i.yV 
-        monsteryTile = int(i.y/32)
-        monsterxTile = int(i.x/32)
-        if (i.yV > 0): #falling down
+        obstacleDistance = monster.yV 
+        monsteryTile = int(monster.y/32)
+        monsterxTile = int(monster.x/32)
+        if (monster.yV > 0): #falling down
             for tile in range(monsteryTile+1, 15):
                 if grid[monsterxTile][tile] >= 1:
-                    distanceToTile = (32*tile) - (i.y + 32)
+                    distanceToTile = (32*tile) - (monster.y + 32)
                     if (distanceToTile < obstacleDistance):
                         obstacleDistance = distanceToTile
-                        i.yV = 0
-        i.y += obstacleDistance
-        if(i.y > (SCREENHEIGHT)):
-            i.y = 0
-            if (i.xV>0): i.xV += 2
-            else: i.xV -= 2
-        if(playerMonsterCollision(playerx, playery, i.x, i.y)):
+                        monster.yV = 0
+        monster.y += obstacleDistance
+        if(monster.y > (SCREENHEIGHT)):
+            monster.y = 0
+            if (monster.xV>0): monster.xV += 2
+            else: monster.xV -= 2
+        if(playerMonsterCollision(playerx, playery, monster.x, monster.y)):
             playerAlive = False
 
            

@@ -3,12 +3,12 @@ from pygame.locals import *
 import pyganim
 
 # create the PygAnimation objects
-spritePlayerStandingFlip = pyganim.PygAnimation([('player1.png', 0.4), ('player2.png', 0.4)])
-spritePlayerWalkingFlip = pyganim.PygAnimation([('player1.png', 0.4), ('player2.png', 0.4)])
-spritePlayerStanding = pyganim.PygAnimation([('player1flip.png', 0.4), ('player2flip.png', 0.4) ])
-spritePlayerWalking = pyganim.PygAnimation([('player1flip.png', 0.4), ('player2flip.png', 0.4)])
-spriteBullet = pyganim.PygAnimation([('bullet.png', 0.4)])
-spriteMonster1 = pyganim.PygAnimation([('monster.png', 0.4)])
+spritePlayerStandingFlip = pyganim.PygAnimation([('graphics/player1.png', 0.4), ('graphics/player2.png', 0.4)])
+spritePlayerWalkingFlip = pyganim.PygAnimation([('graphics/player1.png', 0.4), ('graphics/player2.png', 0.4)])
+spritePlayerStanding = pyganim.PygAnimation([('graphics/player1flip.png', 0.4), ('graphics/player2flip.png', 0.4) ])
+spritePlayerWalking = pyganim.PygAnimation([('graphics/player1flip.png', 0.4), ('graphics/player2flip.png', 0.4)])
+spriteBullet = pyganim.PygAnimation([('graphics/bullet.png', 0.4)])
+spriteMonster1 = pyganim.PygAnimation([('graphics/monster.png', 0.4)])
 
 spritePlayerStanding.play()
 spritePlayerWalking.play()
@@ -17,5 +17,5 @@ spritePlayerWalkingFlip.play()
 spriteBullet.play()
 spriteMonster1.play()
 
-wall = pygame.image.load('platform.png')
-platform = pygame.image.load('wall.png')
+wall = pygame.image.load('graphics/platform.png')
+platform = pygame.image.load('graphics/wall.png')
